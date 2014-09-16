@@ -18,8 +18,7 @@ class JsRoutes
     prefix: nil,
     url_links: nil,
     camel_case: false,
-    default_url_options: {},
-    ignored_required_part: nil
+    default_url_options: {}
   }
 
   NODE_TYPES = {
@@ -96,7 +95,6 @@ class JsRoutes
     js.gsub!("NAMESPACE", @options[:namespace])
     js.gsub!("DEFAULT_URL_OPTIONS", json(@options[:default_url_options].merge(deprecated_default_format)))
     js.gsub!("PREFIX", @options[:prefix] || "")
-    js.gsub!("IGNORED_REQUIRED_PART", @options[:ignored_required_part].to_s)
     js.gsub!("NODE_TYPES", json(NODE_TYPES))
     js.gsub!("ROUTES", js_routes)
   end
@@ -135,7 +133,7 @@ class JsRoutes
       end
     end.flatten.compact
     
-    js_routes << set_prefix_js
+    js_routes += [set_prefix_js, set_default_url_options_js]
 
     "{\n" + js_routes.join(",\n") + "}\n"
   end
@@ -157,7 +155,6 @@ class JsRoutes
     name = [parent_route.try(:name), route.name].compact
     parent_spec = parent_route.try(:path).try(:spec)
     required_parts, optional_parts = route.required_parts.clone, route.optional_parts.clone
-    required_parts.delete(@options[:ignored_required_part].to_sym) if @options[:ignored_required_part].present?
     optional_parts.push(required_parts.delete :format) if required_parts.include?(:format)
     route_name = generate_route_name(name)
     url_link = generate_url_link(name, route_name, required_parts)
@@ -190,12 +187,11 @@ class JsRoutes
 
   def build_params required_parts
     params = required_parts.map do |name|
-      next if @options[:ignored_required_part].to_s == name.to_s
       # prepending each parameter name with underscore
       # to prevent conflict with JS reserved words
       "_#{name}"
     end << LAST_OPTIONS_KEY
-    params.reject(&:nil?).join(", ")
+    params.join(", ")
   end
 
   # This function serializes Journey route into JSON structure
@@ -230,6 +226,14 @@ class JsRoutes
     _ = <<-JS.strip!
     set_prefix: function(path) {
       defaults['prefix'] = path;
+    }
+    JS
+  end
+  
+  def set_default_url_options_js
+    _ = <<-JS.strip!
+    set_default_url_options: function(opts) {
+      defaults['default_url_options'] = opts;
     }
     JS
   end
