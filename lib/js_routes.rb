@@ -188,7 +188,7 @@ class JsRoutes
 
   def build_params required_parts
     params = required_parts.map do |name|
-      next if JsRoutes.ignored_required_part.to_s == name.to_s
+      next if @options[:ignored_required_part].to_s == name.to_s
       # prepending each parameter name with underscore
       # to prevent conflict with JS reserved words
       "_#{name}"
