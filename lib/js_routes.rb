@@ -18,7 +18,8 @@ class JsRoutes
     prefix: nil,
     url_links: nil,
     camel_case: false,
-    default_url_options: {}
+    default_url_options: {},
+    ignored_required_part: nil
   }
 
   NODE_TYPES = {
@@ -187,6 +188,7 @@ class JsRoutes
 
   def build_params required_parts
     params = required_parts.map do |name|
+      next if JsRoutes.ignored_required_part.to_s == name.to_s
       # prepending each parameter name with underscore
       # to prevent conflict with JS reserved words
       "_#{name}"
