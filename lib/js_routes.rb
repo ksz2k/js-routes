@@ -193,7 +193,7 @@ class JsRoutes
       # to prevent conflict with JS reserved words
       "_#{name}"
     end << LAST_OPTIONS_KEY
-    params.join(", ")
+    params.reject(&:nil?).join(", ")
   end
 
   # This function serializes Journey route into JSON structure
