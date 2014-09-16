@@ -156,6 +156,7 @@ class JsRoutes
     name = [parent_route.try(:name), route.name].compact
     parent_spec = parent_route.try(:path).try(:spec)
     required_parts, optional_parts = route.required_parts.clone, route.optional_parts.clone
+    required_parts.delete(@options[:ignored_required_part].to_sym) if @options[:ignored_required_part].present?
     optional_parts.push(required_parts.delete :format) if required_parts.include?(:format)
     route_name = generate_route_name(name)
     url_link = generate_url_link(name, route_name, required_parts)
