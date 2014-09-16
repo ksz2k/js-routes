@@ -96,7 +96,7 @@ class JsRoutes
     js.gsub!("NAMESPACE", @options[:namespace])
     js.gsub!("DEFAULT_URL_OPTIONS", json(@options[:default_url_options].merge(deprecated_default_format)))
     js.gsub!("PREFIX", @options[:prefix] || "")
-    js.gsub!("IGNORED_REQUIRED_PART", @options[:ignored_required_part] || "")
+    js.gsub!("IGNORED_REQUIRED_PART", @options[:ignored_required_part].to_s)
     js.gsub!("NODE_TYPES", json(NODE_TYPES))
     js.gsub!("ROUTES", js_routes)
   end
